@@ -24,11 +24,12 @@ jobs:
       - name: Find outputs
         shell: pwsh
         run: |
-          Get-ChildItem -Recurse -Include kdmapper.exe,iqvw64e.sys | ForEach-Object { Write-Host $_.FullName }
+          Get-ChildItem -Recurse -Include *.exe,*.sys,*.dll | ForEach-Object { Write-Host $_.FullName }
 
       - uses: actions/upload-artifact@v4
         with:
           name: kdmapper-binaries
           path: |
+            **/kdmapper_Release.exe
             **/kdmapper.exe
             **/iqvw64e.sys
