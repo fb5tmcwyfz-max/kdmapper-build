@@ -1,0 +1,34 @@
+name: build-kdmapper
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Locate and build
+        shell: pwsh
+        run: |
+          $sln = Get-ChildItem -Recurse -Filter "*.sln" | Select-Object -First 1
+          if (-not $sln) { throw "no .sln found" }
+          Write-Host "Found: $($sln.FullName)"
+          msbuild $sln.FullName /p:Configuration=Release /p:Platform=x64
+
+      - name: Find outputs
+        shell: pwsh
+        run: |
+          Get-ChildItem -Recurse -Include kdmapper.exe,iqvw64e.sys | ForEach-Object { Write-Host $_.FullName }
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kdmapper-binaries
+          path: |
+            **/kdmapper.exe
+            **/iqvw64e.sys
